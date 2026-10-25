@@ -57,6 +57,11 @@ with tempfile.TemporaryDirectory(prefix='SimpleCut-public-test-') as td:
     hashes={line.split()[1]:line.split()[0] for line in sums.read_text(encoding='utf-8-sig').splitlines() if line.strip()}
     assert hashes[f'SimpleCut-{version}-Setup.exe']==hashlib.sha256(installer.read_bytes()).hexdigest()
     assert hashes[f'SimpleCut-{version}-update.zip']==sha
+    if 'application.zip' in hashes:
+        recovery=root/'application.zip'
+        download(f'https://github.com/{REPO}/releases/download/v{version}/application.zip',recovery,16*1024*1024)
+        assert recovery.read_bytes()==package.read_bytes()
+        assert hashes['application.zip']==sha
     installed=root/'installed';exe=installed/'SimpleCut.exe'
     subprocess.run([str(installer),'/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/TASKS=',f'/DIR={installed}'],check=True,timeout=180)
     try:

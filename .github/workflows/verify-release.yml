@@ -25,6 +25,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: public-release-verification
+          name: public-release-verification-${{ github.run_id }}-${{ github.run_attempt }}
           path: evidence/*.json
           retention-days: 7
