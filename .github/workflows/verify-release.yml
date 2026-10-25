@@ -1,0 +1,30 @@
+name: Verify public SimpleCut release
+on:
+  push:
+    paths:
+      - '.github/workflows/verify-release.yml'
+      - 'tests/verify_release.py'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  public-windows:
+    runs-on: windows-2022
+    timeout-minutes: 15
+    env:
+      PYTHONUTF8: '1'
+      QT_QPA_PLATFORM: offscreen
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download anonymously, install and activate the real published package
+        run: python tests/verify_release.py
+      - name: Save verification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-release-verification
+          path: evidence/*.json
+          retention-days: 7
